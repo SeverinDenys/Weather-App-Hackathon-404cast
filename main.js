@@ -74,8 +74,7 @@ async function onSevenDaysClick (e) {
     });
 
     moreInfoContainer.innerHTML = `
-      <h2 class='week-list-title'> ${data.city.name.toUpperCase()}</h2>
-         <p class='week-list-subtitle'>Weather forecast for 7 days:</p>
+         <h2 class='week-list-subtitle'>Weather forecast for 7 days:</h2>
       <div class="forecast-container">
         ${dailyEntry
           .slice(0, 7)
@@ -241,10 +240,15 @@ function createCityMarkup (city) {
   year: "numeric",
 });
 
+
 const time = date.toLocaleTimeString("ru-RU", {
   hour: "2-digit",
   minute: "2-digit",
 });
+
+
+
+
   return `
   <div class='city-card'>
   <h1 class='city-title'>${city.name}</h1>
@@ -266,6 +270,7 @@ const time = date.toLocaleTimeString("ru-RU", {
         <div class='more-info-container'></div>
         </div>`
 }
+
 
 
 

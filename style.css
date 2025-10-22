@@ -7,6 +7,11 @@ p, span, h1,h2,p {
     padding: 0;
 }
 
+a {
+    text-decoration: none;
+    color: black;
+}
+
 ul {
     list-style: none;
     padding-left: 0px;
@@ -39,7 +44,7 @@ button {
 }
 
 body {
-    background:center/cover no-repeat fixed url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=2400&auto=format&fit=crop');
+    background:center/cover no-repeat fixed url('./images/skysky.jpg');
 
 }
 
@@ -57,11 +62,19 @@ main > section {
 /* HEADER */
 header > .container {
   display:flex;                                  
-  justify-content:center;                      
+  justify-content:space-between;                      
   align-items:center;                           
   padding:12px;                                  
   backdrop-filter:blur(6px);                    
 }
+
+
+.logo {
+    display: flex;
+    align-items: center;
+    font-size: 32px;
+}
+
 
 .btn-list{
   display:flex;
@@ -70,7 +83,7 @@ header > .container {
 
 .nav-btn{
   display:inline-block;                          
-  padding:8px 14px;                              
+  padding:12px 20px;                              
   border-radius:999px;                         
   border:none;                                   
   background: rgba(255,255,255,.55);                      
@@ -197,10 +210,15 @@ h1 {
 
 /* 7 days weather */
 
-.week-list-title {
-    font-size: 32px;
-    margin-bottom: 4px;
+.more-info-container {
+    margin-top: 12px;
 }
+
+.more-info-container > h2 {
+    text-align: center;
+}
+
+
 
 .week-list-subtitle {
     font-size: 24px;
