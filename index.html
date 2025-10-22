@@ -1,19 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="style.css" />
-    <title>Document</title>
-  </head>
-  <body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+  <title>Document</title>
+</head>
+
+<body>
+  <div class="bg-overlay"></div>
+  <header>
+    <div class="container">
+      <nav>
+        <ul class="btn-list">
+          <li><button data-id="home" class="active nav-btn">Home</button></li>
+          <li><button data-id="favorites" class="nav-btn">Favorites</button></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  <main>
     <section>
-      <div>
-        <input type="text" id="city-input" placeholder="Enter city name" />
-        <button id="city-input-btn">Get Weather</button>
-      </div>
-      <div class="container"></div>
+
     </section>
-    <script src="main.js"></script>
-  </body>
+
+
+  </main>
+
+  <script src="main.js"></script>
+</body>
+
 </html>

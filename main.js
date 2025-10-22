@@ -1,15 +1,63 @@
 const API_KEY = "a1aa435f89b1f58779c0e2ca8fbb02ad";
-const container = document.querySelector(".container");
-const input = document.getElementById("city-input");
-const btn = document.getElementById("city-input-btn");
+const BASE_URL = 'https://api.openweathermap.org/data/2.5/'
 
-btn.addEventListener("click", async () => {
-  const city = input.value.trim();
+const sectionEl = document.querySelector('section')
+const navList = document.querySelector('nav > ul')
+const navButtons = document.querySelectorAll('nav > ul > li > button')
+
+markupHomePage()
+
+let favorites = JSON.parse(localStorage.getItem('cities')) || []
+
+
+let container;
+let input;
+let btn ;
+
+getElementsOnHomePage();
+
+navList.addEventListener('click', onNavClick)
+
+function onActionClick ({target}) {
+    const {name} = target.dataset
+if (favorites.some(el => el === name)) {
+    favorites = favorites.filter(el => name !== el)
+    target.textContent = '♡';
+} else {
+    favorites.push(name)
+    target.innerHTML = '✖';
+}
+    localStorage.setItem('cities', JSON.stringify(favorites))
+
+}
+
+async function onGetWeatherClick() {
+    try {
+          const result = await getDataByCityName(input.value.trim())
+  container.innerHTML = createCityMarkup(result)
+  const moreInfoBtn = container.querySelector('.more-info');
+  const actionBtn = container.querySelector('.action-btn')
+
+  actionBtn.addEventListener('click', onActionClick)
+
+ 
+
+  moreInfoContainer = document.querySelector('.more-info-container')
+  moreInfoBtn.addEventListener('click', onSevenDaysClick)
+
+  input.value = ''
+    } catch (error) {
+        container.innerHTML = '<p class="error">We couldnt find weather at this city</p>'    }
+
+}
+
+async function onSevenDaysClick () {
+ const city = input.value.trim();
   if (!city) return alert("Enter a city");
 
   try {
     const res = await fetch(
-      `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${API_KEY}`
+      `${BASE_URL}forecast?q=${city}&units=metric&appid=${API_KEY}`
     );
     if (!res.ok) throw new Error("City not found");
     const data = await res.json();
@@ -25,9 +73,9 @@ btn.addEventListener("click", async () => {
       }
     });
 
-    container.innerHTML = `
-      <h2>${data.city.name.toUpperCase()}</h2>
-         <p>Weather forecast for 7 days:</p>
+    moreInfoContainer.innerHTML = `
+      <h2 class='week-list-title'> ${data.city.name.toUpperCase()}</h2>
+         <p class='week-list-subtitle'>Weather forecast for 7 days:</p>
       <div class="forecast-container">
         ${dailyEntry
           .slice(0, 7)
@@ -51,7 +99,164 @@ btn.addEventListener("click", async () => {
           .join("")}
       </div>
     `;
+    const moreInfoBtn = container.querySelector('.more-info');
+    moreInfoBtn.remove()
   } catch (err) {
     alert(err.message);
   }
+}
+
+function markupHomePage () {
+sectionEl.innerHTML = `
+<div class="container">
+        <div class='form-container'>
+          <input type="text" autocomplete=off id="city-input" placeholder="Enter city name" />
+          <button id="city-input-btn">🔎</button>
+        </div>
+        <div class="result"></div>
+      </div>
+`
+}
+
+
+function createFavoritesMarkup  (arr) {
+if (arr.length > 0) {
+  return '<div class="container">' + '<ul class="favorites-list">' +  arr.map(el => `<li class=${el.name}>
+    <div class='title-info'>
+    <img src='https://openweathermap.org/img/wn/${el.weather[0].icon}.png' alt=${el.name} />
+    <h2>${el.name}</h2> 
+    </div>
+        <p>${el.main.temp} &degC</p>
+        <button class='delete-btn' data-name='${el.name}'>✖</button>
+        </li>`).join('') + '</ul>' + '</div>'
+
+} else {
+    return '<div class="container"><h2>You havent any favorites cities</h2></div>'
+}
+}
+
+function onNavClick({target}) {
+    if (target.nodeName !== 'BUTTON' || target.classList.contains('active')) return;
+   
+    changeActive(target)
+
+    const {id} = target.dataset
+    if (id === 'favorites' ) {
+        addFavoritesMarkup()
+    } else {
+        markupHomePage()
+        getElementsOnHomePage()
+    }
+
+}
+
+function onDeleteClick(e) {
+    const {name} = e.target.dataset;
+
+    favorites = favorites.filter(el => el !== name)
+    localStorage.setItem('cities', JSON.stringify(favorites))
+
+    if(favorites.length === 0) {
+        sectionEl.innerHTML =  '<div class="container"><h2>You havent any favorites cities</h2></div>'
+    } else {
+    const elForDeleting = document.querySelector(`.${name}`)
+    elForDeleting.remove();
+    }
+
+
+}
+
+
+async function addFavoritesMarkup () {
+    sectionEl.innerHTML = '<div class="container"><p class="loading"><span class="loader"></span></p></div>'
+    try {
+
+const data = await getFavoritesData();
+const markup = createFavoritesMarkup(data)
+sectionEl.innerHTML = markup
+const deleteBtnsList = document.querySelectorAll('.delete-btn');
+deleteBtnsList.forEach(el => {
+el.addEventListener('click', onDeleteClick)
+
+})
+
+
+
+
+    } catch (error) {
+        sectionEl.innerHTML = '<p>Oops.... Something went wrong</p>'
+        console.log('error :>> ', error);
+    } 
+}
+
+
+function changeActive (target) {
+ navButtons.forEach(btn => btn === target ? btn.classList.add('active') : btn.classList.remove('active'))
+}
+
+async function getFavoritesData () {
+    const promises = [];
+favorites.forEach((el) => {
+    promises.push(fetch(`${BASE_URL}weather?q=${el}&appid=${API_KEY}&units=metric`).then(data => data.json()))
+})
+
+return (await Promise.allSettled(promises)).map(resp => resp.value)
+}
+
+function getElementsOnHomePage () {
+ container = document.querySelector(".result");
+ input = document.getElementById("city-input");
+ btn = document.getElementById("city-input-btn");
+
+btn.addEventListener("click", onGetWeatherClick);
+}
+
+
+async function getDataByCityName(name) {
+    const response = await fetch(`${BASE_URL}weather?q=${name}&units=metric&appid=${API_KEY}`);
+    if(!response.ok)  throw new Error("City not found")
+    const result = await response.json()
+    return result
+
+}
+
+
+function createCityMarkup (city) {
+    const isFavorite = favorites.some(el => el === city.name)
+    const date = new Date(city.dt)
+    const formattedDate = date.toLocaleDateString("en-GB", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
 });
+
+const time = date.toLocaleTimeString("ru-RU", {
+  hour: "2-digit",
+  minute: "2-digit",
+});
+  return `
+  <div class='city-card'>
+  <h1 class='city-title'>${city.name}</h1>
+    <div class='city-info'>
+        <div class='temp-info'>
+         <img src='https://openweathermap.org/img/wn/${city.weather[0].icon}.png' alt=${city.name} />
+        <p>${city.main.temp} &degC</p>
+        </div>
+        <div class='city-info-btn-list'>
+        <button class='action-btn' data-name=${city.name}>${isFavorite ? '✖' : '♡'}</button>
+        <button class='more-info' >More info</button>
+        </div>
+        </div>
+        <div class='time-container'>
+            <p>${time}</p>
+            <p>${formattedDate}</p>
+
+        </div>
+        <div class='more-info-container'></div>
+        </div>`
+}
+
+
+
+
+
