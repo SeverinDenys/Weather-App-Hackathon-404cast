@@ -29,7 +29,7 @@ btn.addEventListener("click", async () => {
       <h2>${data.city.name.toUpperCase()}</h2>
          <p>Weather forecast for 7 days:</p>
       <div class="forecast-container">
-        ${daily
+        ${dailyEntry
           .slice(0, 7)
           .map((day) => {
             const date = new Date(day.dt * 1000).toLocaleDateString("en-GB", {
