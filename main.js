@@ -122,11 +122,8 @@ function createFavoritesMarkup  (arr) {
 if (arr.length > 0) {
 
   return '<div class="container">' + '<ul class="favorites-list">' +  arr.map(el => {
-    const date = new Date(el.dt)
-      const time = date.toLocaleTimeString("ru-RU", {
-  hour: "2-digit",
-  minute: "2-digit",
-});
+
+    const currentTime = getCurrentDate(el.dt, el.timezone)
 
 
     
@@ -136,7 +133,7 @@ if (arr.length > 0) {
     <h2>${el.name}</h2> 
     </div>
         <p>${el.main.temp} &degC</p>
-        <p>${time}</p>
+        <p>${currentTime[1]}</p>
         <button class='delete-btn' data-name='${el.name}'>✖</button>
         </li>`}).join('') + '</ul>' + '</div>'
 
@@ -233,18 +230,10 @@ async function getDataByCityName(name) {
 
 function createCityMarkup (city) {
     const isFavorite = favorites.some(el => el === city.name)
-    const date = new Date(city.dt*1000)
-    const formattedDate = date.toLocaleDateString("en-GB", {
-  day: "numeric",
-  month: "long",
-  year: "numeric",
-});
+    const currentTime = getCurrentDate(city.dt, city.timezone)
 
 
-const time = date.toLocaleTimeString("ru-RU", {
-  hour: "2-digit",
-  minute: "2-digit",
-});
+
 
 
 
@@ -263,8 +252,8 @@ const time = date.toLocaleTimeString("ru-RU", {
         </div>
         </div>
         <div class='time-container'>
-            <p>${time}</p>
-            <p>${formattedDate}</p>
+            <p>${currentTime[1]}</p>
+            <p>${currentTime[0]}</p>
 
         </div>
         <div class='more-info-container'></div>
@@ -272,7 +261,24 @@ const time = date.toLocaleTimeString("ru-RU", {
 }
 
 
+function getCurrentDate (dt, timezone) {
+const utcDate = dt * 1000; 
+const timezoneOffset = timezone * 1000; 
+const localDate = new Date(utcDate + timezoneOffset - (1000 * 60 * 60 * 3));
 
+const time = localDate.toLocaleTimeString("en-GB", {
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
+const date = localDate.toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+          });
+
+return [date, time]
+}
 
 
 
