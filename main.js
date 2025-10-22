@@ -51,8 +51,8 @@ async function onGetWeatherClick() {
 
 }
 
-async function onSevenDaysClick () {
- const city = input.value.trim();
+async function onSevenDaysClick (e) {
+ const city = e.target.dataset.name;
   if (!city) return alert("Enter a city");
 
   try {
@@ -121,17 +121,28 @@ sectionEl.innerHTML = `
 
 function createFavoritesMarkup  (arr) {
 if (arr.length > 0) {
-  return '<div class="container">' + '<ul class="favorites-list">' +  arr.map(el => `<li class=${el.name}>
+
+  return '<div class="container">' + '<ul class="favorites-list">' +  arr.map(el => {
+    const date = new Date(el.dt)
+      const time = date.toLocaleTimeString("ru-RU", {
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
+
+    
+    return `<li class=${el.name}>
     <div class='title-info'>
     <img src='https://openweathermap.org/img/wn/${el.weather[0].icon}.png' alt=${el.name} />
     <h2>${el.name}</h2> 
     </div>
         <p>${el.main.temp} &degC</p>
+        <p>${time}</p>
         <button class='delete-btn' data-name='${el.name}'>✖</button>
-        </li>`).join('') + '</ul>' + '</div>'
+        </li>`}).join('') + '</ul>' + '</div>'
 
 } else {
-    return '<div class="container"><h2>You havent any favorites cities</h2></div>'
+    return '<div class="container"><h2 class="empty-list">You havent any favorites cities</h2></div>'
 }
 }
 
@@ -223,7 +234,7 @@ async function getDataByCityName(name) {
 
 function createCityMarkup (city) {
     const isFavorite = favorites.some(el => el === city.name)
-    const date = new Date(city.dt)
+    const date = new Date(city.dt*1000)
     const formattedDate = date.toLocaleDateString("en-GB", {
   day: "numeric",
   month: "long",
@@ -244,7 +255,7 @@ const time = date.toLocaleTimeString("ru-RU", {
         </div>
         <div class='city-info-btn-list'>
         <button class='action-btn' data-name=${city.name}>${isFavorite ? '✖' : '♡'}</button>
-        <button class='more-info' >More info</button>
+        <button class='more-info' data-name=${city.name} >More info</button>
         </div>
         </div>
         <div class='time-container'>
@@ -255,6 +266,7 @@ const time = date.toLocaleTimeString("ru-RU", {
         <div class='more-info-container'></div>
         </div>`
 }
+
 
 
 

@@ -291,6 +291,19 @@ h1 {
     font-weight: 600;
 }
 
+.delete-btn {
+    border : none;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: 250ms linear;
+}
+
+.delete-btn:hover {
+    transform: scale(1.4);
+}
+
 .title-info {
     display: flex;
     align-items: center;
@@ -300,5 +313,9 @@ h1 {
 .error {
     color: red;
     font-size: 24px;
+    text-align: center;
+}
+
+.empty-list {
     text-align: center;
 }
